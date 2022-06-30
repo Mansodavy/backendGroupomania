@@ -118,7 +118,7 @@ exports.deletecomment = async (req,res) => {
 					id: req.params.id,
 				},
 			});
-			res.status(201).send({ message: 'Comment deleted' });
+			res.status(200).send({ message: 'Comment deleted' });
 		} else {
 			res.status(404).send({ message: 'Comment not found' });
 		}
@@ -126,3 +126,25 @@ exports.deletecomment = async (req,res) => {
 		res.status(400).send(e);
 	}
 }																				
+
+exports.deletePosts = async (req,res) => {
+	try {
+		const post = await Post.findOne({
+			where: {
+				id: req.params.id,
+			},
+		});
+		if (post) {
+			Post.destroy({
+				where: {
+					id: req.params.id,
+				},
+			});
+			res.status(200).send({ message: 'Post deleted' });
+		} else {
+			res.status(404).send({ message: 'Post not found' });
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+}

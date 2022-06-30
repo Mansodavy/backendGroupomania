@@ -3,6 +3,7 @@ const config = require("../config/auth.config");
 const Op = db.Sequelize.Op;
 const User = db.user;
 const Role = db.role;
+const multer = require("multer");
 
 exports.allAccess = (req, res) => {
   res.status(200).send("Public Content.");
@@ -135,3 +136,24 @@ exports.verifyuserrole = (req, res) => {
       });
     });
 };
+exports.editimage = (req, res) => {
+  User.update(
+    {
+      imageUrl: req.body.imageUrl,
+    },
+    {
+      where: {
+        id: req.params.id,
+      },
+    }
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving users.",
+      });
+    });
+}
+    
