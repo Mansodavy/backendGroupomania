@@ -11,9 +11,10 @@ module.exports = function (app) {
         next();
       });
     app.post("/api/posts", multer, verifyToken, controller.createPosts);
-    app.post("/api/posts/:id/comments", verifyToken, controller.postcomment);
+    app.post("/api/posts/comments/:id", verifyToken, controller.postcomment);
     app.get("/api/posts", verifyToken, controller.getAllPosts);
     app.get("/api/posts/:id", verifyToken, controller.getOnePosts);
     app.delete("/api/posts/:id", verifyToken, controller.deletePosts);
     app.delete("/api/posts/comments/:id", verifyToken, controller.deletecomment);
+    app.put("/api/posts/edit/:id", multer, verifyToken, controller.Editpostwithimage);
 };

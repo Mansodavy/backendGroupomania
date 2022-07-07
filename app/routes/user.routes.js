@@ -11,14 +11,7 @@ module.exports = function(app) {
     next();
   });
   app.get("/api/user/getOneUser/:id", verifyToken, controller.getOneUser);
-  app.get("/api/user/verifyrank/:id", verifyToken, controller.verifyuserrole);
-  app.get("/api/user/getUser", verifyToken, controller.getUser);
   app.put("/api/user/", verifyToken, controller.editprofil);
-  app.put("/api/user/image", multer, verifyToken, controller.editimage);
+  app.put("/api/user/image/", multer, verifyToken, controller.editimage);
   app.delete("/api/user/", verifyToken, controller.deleteUser);
-  app.get(
-    "/api/test/user",
-    [authJwt.verifyToken],
-    controller.userBoard
-  );
 };
