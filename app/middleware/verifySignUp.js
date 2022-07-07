@@ -4,19 +4,6 @@ const User = db.user;
 
 checkDuplicateUsernameOrEmail = async (req, res, next) => {
   try {
-    // Username
-    let user = await User.findOne({
-      where: {
-        email: req.body.email
-      }
-    });
-
-    if (user) {
-      return res.status(400).send({
-        message: "Failed! email is already in use!"
-      });
-    }
-
     // Email
     user = await User.findOne({
       where: {
@@ -26,7 +13,7 @@ checkDuplicateUsernameOrEmail = async (req, res, next) => {
 
     if (user) {
       return res.status(400).send({
-        message: "Failed! email is already in use!"
+        message: "Échec ! L'email est déjà utilisé !"
       });
     }
 
@@ -43,7 +30,7 @@ checkRolesExisted = (req, res, next) => {
     for (let i = 0; i < req.body.roles.length; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
         res.status(400).send({
-          message: "Failed! Role does not exist = " + req.body.roles[i]
+          message: "Échec ! Le rôle n'existe pas = " + req.body.roles[i]
         });
         return;
       }

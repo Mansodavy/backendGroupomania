@@ -4,23 +4,13 @@ const Op = db.Sequelize.Op;
 const User = db.user;
 const Role = db.role;
 const multer = require("multer");
-
-exports.allAccess = (req, res) => {
-  res.status(200).send("Public Content.");
-};
-
-exports.userBoard = (req, res) => {
-  res.status(200).send("User Content.");
-};
-
-exports.adminBoard = (req, res) => {
-  res.status(200).send("Admin Content.");
-};
+const { user } = require("../models");
+const fs = require("fs");
 
 exports.getOneUser = (req, res) => {
   User.findOne({
     where: {
-      id: req.params.id,
+      id: req.userId,
     },
     attributes: ["id"],
     include: [
@@ -37,34 +27,11 @@ exports.getOneUser = (req, res) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        res.status(404).send({ message: "User not found" });
+        res.status(404).send({ message: "Utilisateur introuvable" });
       }
     })
     .catch((err) => {
       res.status(500).send({ message: err.message });
-    });
-};
-
-exports.getUser = (req, res) => {
-  User.findAll({
-    attributes: ["id", "nom", "prenom", "email", "imageUrl"],
-    include: [
-      {
-        model: db.role,
-        attributes: ["id", "name"],
-        through: {
-          attributes: [],
-        },
-      },
-    ],
-  })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
-      });
     });
 };
 
@@ -76,7 +43,7 @@ exports.editprofil = (req, res) => {
     },
     {
       where: {
-        id: req.params.id,
+        id: req.userId
       },
     }
   )
@@ -85,7 +52,7 @@ exports.editprofil = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
+        message: err.message || "Une erreur s'est produite lors de la récupération des utilisateurs.",
       });
     });
 };
@@ -101,59 +68,34 @@ exports.deleteUser = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
+        message: err.message || "Une erreur s'est produite lors de la récupération des utilisateurs.",
       });
     });
 };
 
-exports.verifyuserrole = (req, res) => {
-  User.findOne({
-    where: {
-      id: req.params.id,
-    },
-    attributes: ["id"],
-    include: [
-      {
-        model: db.role,
-        attributes: ["id"],
-        through: {
-          attributes: [],
-        },
-      },
-    ],
-  })
-    .then((data) => {
-      if (data.roles.roleId === 4) {
-        res.status(200).send(true);
-      } else {
-        res.status(200).send(false);
-        console.log(data);
+exports.editimage = async (req, res) => {
+  try {
+  const profile = req.file
+    ? {
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${
+          req.file.filename
+        }`,
       }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
-      });
-    });
-};
-exports.editimage = (req, res) => {
-  User.update(
-    {
-      imageUrl: req.body.imageUrl,
-    },
-    {
-      where: {
-        id: req.params.id,
-      },
-    }
-  )
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
-      });
-    });
+    : { ...req.body };
+
+  if (profile.imageUrl) {
+    const user = await User.findOne({ where: { id: req.userId } });
+    const ancienneimage = user.imageUrl.split('/images/')[1];
+    fs.unlinkSync(`images/${ancienneimage}`);
+  }
+  const user = await User.update(profile, {
+    where: { id: req.userId },
+  });
+  if (!user) {
+    res.status(404).send();
+  }
+  res.status(200).json({ message: 'Image de profile modifiée' });
+} catch (e) {
+  res.status(500).send(e);
 }
-    
+};
