@@ -64,6 +64,12 @@ exports.getAllPosts = async (req, res) => {
           model: db.user,
           attributes: ["id", "nom", "prenom", "imageUrl"],
         },
+          {
+            model: db.comments,
+            limit : 5,
+            attributes: ["commentaire"],
+          },
+      
       ],
     });
 	console.log(posts.length);
@@ -155,6 +161,9 @@ exports.deletePosts = async (req, res) => {
         id: req.params.id,
       },
     });
+    const fileName = post.imageUrl.split('images/')[1];
+		console.log(post.imageUrl);
+		fs.unlinkSync(`./images/${fileName}`);
     if (post) {
       Post.destroy({
         where: {
