@@ -47,12 +47,6 @@ db.sequelize.sync();
 //   console.log('Drop and Resync Database with { force: true }');
 //   initial();
 // });
-
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to test application." });
-});
-
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
