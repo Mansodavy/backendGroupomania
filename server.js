@@ -46,6 +46,20 @@ const db = require("./app/models");
 const Role = db.role;
 
 db.sequelize.sync();
+<<<<<<< HEAD
+=======
+// force: true will drop the table if it already exists
+// db.sequelize.sync({force: true}).then(() => {
+//   console.log('Drop and Resync Database with { force: true }');
+//   initial();
+// });
+
+// simple route
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to test application." });
+});
+
+>>>>>>> parent of dadadd3... AddCommentsinsourcecode
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
