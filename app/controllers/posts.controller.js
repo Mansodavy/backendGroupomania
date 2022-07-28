@@ -51,8 +51,13 @@ exports.Editpostwithimage = async (req, res) => {
       // delete the old image
       // Supprime l'ancienne image
 			const oldPost = await Post.findOne({ where: { id: req.params.id } });
-			const oldFile = oldPost.imageUrl.split('/images/')[1];
-			fs.unlinkSync(`images/${oldFile}`);
+      const oldFile = oldPost.imageUrl.split('/images/')[1];
+      fs.unlink(`images/${oldFile}`, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+      );
 		}
 		const post = await Post.update(postObject, {
 			where: { id: req.params.id },
@@ -195,11 +200,6 @@ exports.deletePosts = async (req, res) => {
         id: req.params.id,
       },
     });
-    // Delete the image of the post
-    // Supprime l'image du post
-    const fileName = post.imageUrl.split('images/')[1];
-		console.log(post.imageUrl);
-		fs.unlinkSync(`./images/${fileName}`);
     // Verify if the post is found
     // Vérifie si le post est trouvé
     if (post) {
@@ -208,7 +208,14 @@ exports.deletePosts = async (req, res) => {
           id: req.params.id,
         },
       });
-      res.status(200).send({ message: "Post Supprimée" });
+          // Delete the image of the post
+    // Supprime l'image du post
+    
+    const fileName = post.imageUrl.split('images/')[1];
+    if (fileName) {
+      fs.unlinkSync(`images/${fileName}`);
+    }
+    res.status(200).send({ message: "Post Supprimée" });
     } else {
       res.status(404).send({ message: "Post introuvable" });
     }

@@ -104,7 +104,12 @@ exports.editimage = async (req, res) => {
     // delete old image
     // Supprime l'ancienne image
     const ancienneimage = user.imageUrl.split('/images/')[1];
-    fs.unlinkSync(`images/${ancienneimage}`);
+    fs.unlink(`images/${ancienneimage}`, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    }
+    );
   }
   const user = await User.update(profile, {
     where: { id: req.userId },
