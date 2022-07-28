@@ -7,8 +7,6 @@ const multer = require("multer");
 const { user } = require("../models");
 const fs = require("fs");
 
-// get one user by id from the database
-// Trouver un utilisateur par son id dans la base de données
 exports.getOneUser = (req, res) => {
   User.findOne({
     where: {
@@ -37,15 +35,12 @@ exports.getOneUser = (req, res) => {
     });
 };
 
-// Edit user profile in the database by id
-// Modifier le profil d'un utilisateur dans la base de données grace a son id 
 exports.editprofil = (req, res) => {
   User.update(
     {
       nom: req.body.nom,
       prenom: req.body.prenom,
     },
-    
     {
       where: {
         id: req.userId
@@ -61,10 +56,6 @@ exports.editprofil = (req, res) => {
       });
     });
 };
-
-// Delete user profile in the database by id
-// Supprimer le profil d'un utilisateur dans la base de données grace a son id
-
 exports.deleteUser = (req, res) => {
   console.log(req);
   User.destroy({
@@ -82,29 +73,25 @@ exports.deleteUser = (req, res) => {
     });
 };
 
-// EditImage user profile in the database by id
-// Modifier l'image de profil d'un utilisateur dans la base de données grace a son id
 exports.editimage = async (req, res) => {
   try {
-    // Check if file is present
-    // Vérifie si le fichier est présent
   const profile = req.file
     ? {
         imageUrl: `${req.protocol}://${req.get('host')}/images/${
           req.file.filename
         }`,
       }
-      // If no file is present, keep the old image
-      // Si aucun fichier n'est présent, garde l'ancienne image
     : { ...req.body };
-  // Verify if have image
-  // Vérifie si l'utilisateur a une image
+
   if (profile.imageUrl) {
     const user = await User.findOne({ where: { id: req.userId } });
-    // delete old image
-    // Supprime l'ancienne image
     const ancienneimage = user.imageUrl.split('/images/')[1];
-    fs.unlinkSync(`images/${ancienneimage}`);
+    fs.unlink(`images/${ancienneimage}`, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    }
+    );
   }
   const user = await User.update(profile, {
     where: { id: req.userId },
